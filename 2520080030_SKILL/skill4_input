@@ -1,0 +1,110 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX_INPUT 200
+#define MAX_TOKENS 20
+
+struct Token
+{
+    char value[50];
+};
+
+void display_tokens(struct Token tokens[], int count)
+{
+    printf("\n--- Token Stream ---\n");
+
+    for (int i = 0; i < count; i++)
+    {
+        printf("Token %d: %s\n", i + 1, tokens[i].value);
+    }
+}
+
+int main()
+{
+    char input[MAX_INPUT];
+    struct Token tokens[MAX_TOKENS];
+    int token_count = 0;
+
+    printf("Simple Command Parser\n");
+    printf("Enter a command: ");
+
+    fgets(input, sizeof(input), stdin);
+
+    input[strcspn(input, "\n")] = '\0';
+
+    /* Check for empty command */
+    if (strlen(input) == 0)
+    {
+        printf("Error: Empty command!\n");
+        return 0;
+    }
+
+    /* Tokenization */
+    char *token = strtok(input, " \t");
+
+    while (token != NULL && token_count < MAX_TOKENS)
+    {
+        strcpy(tokens[token_count].value, token);
+        token_count++;
+
+        token = strtok(NULL, " \t");
+    }
+
+    /* Check token stream */
+    if (token_count == 0)
+    {
+        printf("Error: No valid tokens found!\n");
+        return 0;
+    }
+
+    display_tokens(tokens, token_count);
+
+    /* Parser logic */
+
+    printf("\n--- Parsing ---\n");
+
+    if (strcmp(tokens[0].value, "ls") == 0)
+    {
+        printf("Valid command: ls\n");
+
+        if (token_count > 1)
+        {
+            printf("Arguments:\n");
+
+            for (int i = 1; i < token_count; i++)
+            {
+                printf("  %s\n", tokens[i].value);
+            }
+        }
+    }
+    else if (strcmp(tokens[0].value, "pwd") == 0)
+    {
+        printf("Valid command: pwd\n");
+
+        if (token_count > 1)
+        {
+            printf("Warning: pwd does not normally require arguments.\n");
+        }
+    }
+    else if (strcmp(tokens[0].value, "echo") == 0)
+    {
+        printf("Valid command: echo\n");
+
+        printf("Execution structure:\n");
+        printf("Command = echo\n");
+
+        for (int i = 1; i < token_count; i++)
+        {
+            printf("Argument %d = %s\n", i, tokens[i].value);
+        }
+    }
+    else
+    {
+        printf("Syntax Error: Unknown command '%s'\n", tokens[0].value);
+    }
+
+    printf("\nParsing completed.\n");
+
+    return 0;
+}
